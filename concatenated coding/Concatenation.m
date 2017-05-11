@@ -2,11 +2,11 @@ clc                     %%%%%%%%%%%%%%%%%%%%%%
 clear all
 K = 768; u = rand(K,1)>0.5; R = 3/4; N = K/R; n = ceil(log2(N));
 
-initPC(N,K,'BEC',1/16);              %initPC(N,K,'BSC',10^(-5));
+initPC(N,K,'BEC',1/8);              %initPC(N,K,'BSC',10^(-5));
 
-fun_hb;EbN0 = [1.5 2.0 2.5,3.0,3.5 4.0];rate = 2/3;iter_max0 = 10;
-for i = 1:6
-    len = 0;ErrB = 0;frame = 100;
+fun_hb;EbN0 = [1.5 2.0 2.5,3.0];rate = 2/3;iter_max0 = 30;
+for i = 1:4
+    len = 0;ErrB = 0;frame = 10;
     for j = 1:frame
         for z = 1   %%-----------%% useless
         %%%%%%%%%%%%%%    PC±àÂë    %%%%%%%%%%%%%%%%%%
@@ -26,16 +26,16 @@ for i = 1:6
         [dout,LL] = LD_dec(ch,iter_max0);
         %%%%%%%%%%%   LDPC¼õ¶Ì²¢µ÷Õû   %%%%%%%%%%%%%%%
         yy = LL(1:1024);
+        
         zero_yy = [yy 0];
         temp_yy = sort(zero_yy);
         indOfZero = find(temp_yy==0);
         ymsg = zeros(1,1024);
         end   %%-----------%% useless
         for k = 1:1024
-            if yy(k) > temp_yy(indOfZero + 8)
-                
+            if yy(k) > temp_yy(indOfZero + 64)
                 ymsg(k) = 0;
-            elseif yy(k) <= temp_yy(indOfZero - 8)
+            elseif yy(k) <= temp_yy(indOfZero - 64)
                 ymsg(k) = 1;
             else
                 ymsg(k) = 2;
@@ -43,7 +43,7 @@ for i = 1:6
         end
         %%%%%%%%%%%%%%    PCÒëÂë    %%%%%%%%%%%%%%%%%%
         %uu = pdecode(dout(1:1024),'BSC',10^(-5));
-        uu = pdecode(ymsg,'BEC',1/64);
+        uu = pdecode(ymsg,'BEC',1/8);
         %%%%%%%%%%%%%%     Îó²î     %%%%%%%%%%%%%%%%%%
         len = len + length(find(uu ~= u));
         if ~isequal(uu,u)
@@ -70,20 +70,9 @@ for i = 1:6
         fprintf('NERR3 = %f, NFERR3 = %f\n', Nerr,Nferr);
     elseif i == 4
         fprintf('NERR4 = %f, NFERR4 = %f\n', Nerr,Nferr);
-    elseif i == 5
-        fprintf('NERR5 = %f, NFERR5 = %f\n', Nerr,Nferr);
-    elseif i == 6
-        fprintf('NERR6 = %f, NFERR6 = %f\n', Nerr,Nferr);
+    %elseif i == 5
+    %    fprintf('NERR5 = %f, NFERR5 = %f\n', Nerr,Nferr);
+    %elseif i == 6
+    %    fprintf('NERR6 = %f, NFERR6 = %f\n', Nerr,Nferr);
     end
 end
-%xlab = 1:.1:4;
-%ylab = [NERR1 NERR2 NERR3 NERR4];
-%yylab = [NFERR1 NFERR2 NFERR3 NFERR4];
-%semilogy(EbN0(xlab),ylab(xlab),'^-');
-%hold on
-%semilogy(EbN0(xlab),yylab(xlab),'^v-');
-%title('BER Performance and FER Performance');
-%legend('NERR', 'NFERR');
-%ylabel('Performance');
-%xlabel('SNR');
-%grid on;

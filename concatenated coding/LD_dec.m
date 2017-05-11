@@ -78,7 +78,7 @@ while (iter < itera_max)
     iter=iter+1;
     
     sss = LD_calss(Hb,dout);   %¼ÆËã°éËæÊ½S
-    if sss == 0        
+    if sss == 0 
         break;
     end
    
